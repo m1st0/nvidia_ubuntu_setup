@@ -39,6 +39,9 @@ Usage Example:
 The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward. If 
 ran without parameteres it attempts to conserve power by 
 
+### nvidia-kernel-common.conf
+
+Retains version of Nvidia package installation for my system since later versions extensively modify Ubuntu breaking functionality.
 
 ## Requirements
 
@@ -49,5 +52,5 @@ ran without parameteres it attempts to conserve power by
 ## Known Limitations
 
 - May require manual tweaking for hybrid-GPU laptops with unusual power management firmware.
-
+- May require nvidia-kernel-common.conf to be updated for newer Nvidia packages.
 

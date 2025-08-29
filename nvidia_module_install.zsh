@@ -12,7 +12,7 @@
 
 # Prevent conflicting services from being installed in newer packages.
 # Define where the source file is (your custom preference file)
-SOURCE_FILE="nvidia-kernel-common-570.conf"
+SOURCE_FILE="nvidia-kernel-common.conf"
 
 # Define the target path
 TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common-570"

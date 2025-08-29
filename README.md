@@ -21,8 +21,8 @@ Purpose:
 - Prevents service conflicts by disabling unnecessary daemons or services that may interfere with Wayland session handling.
 - Optional configuration for PRIME or dynamic GPU switching.
 
-Usage Example:
-    ./nvidia_module_install.zsh
+Usage:
+- `./nvidia_module_install.zsh`
 
 ### nvidia_wake.zsh
 
@@ -32,9 +32,9 @@ Purpose:
 - Unloads Nvidia modules after the program exits (optional, for power saving).
 
 Usage Example:
-    ./nvidia_wake.zsh glxinfo
-    ./nvidia_wake.zsh blender
-    ./nvidia_wake.zsh
+- `./nvidia_wake.zsh glxinfo`
+- `./nvidia_wake.zsh blender`
+- `./nvidia_wake.zsh` turns off Nvidia card (hopefully)
 
 The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward. If 
 ran without parameteres it attempts to conserve power by 
@@ -43,12 +43,11 @@ ran without parameteres it attempts to conserve power by
 ## Requirements
 
 - Ubuntu or other Debian-based Linux distro.
-- Zsh shell (for nvidia_wake.zsh) or modify for Bash.
+- Zsh shell for scripts or modify for Bash.
 - sudo privileges for driver installation and module management.
 
 ## Known Limitations
 
-- Requires secure boot to be disabled (for kernel module signing issues).
 - May require manual tweaking for hybrid-GPU laptops with unusual power management firmware.
 
 

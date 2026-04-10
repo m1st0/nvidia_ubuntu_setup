@@ -15,7 +15,7 @@
 SOURCE_FILE="nvidia-kernel-common.conf"
 
 # Define the target path
-TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common-570"
+TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common-580"
 
 # Check if source file exists
 if [[ ! -f "$SOURCE_FILE" ]]; then
@@ -38,13 +38,13 @@ kernel_name=$(uname -r)
 
 # Define the packages to check
 packages=(
-    "linux-modules-nvidia-570-${kernel_name}"
-    "linux-objects-nvidia-570-${kernel_name}"
+    "linux-modules-nvidia-580-${kernel_name}"
+    "linux-objects-nvidia-580-${kernel_name}"
     "linux-signatures-nvidia-${kernel_name}"
-    "nvidia-utils-570"
-    "libnvidia-gl-570"
+    "nvidia-utils-580"
+    "libnvidia-gl-580"
     # Until we have X11 gone.
-    "xserver-xorg-video-nvidia-570"
+    "xserver-xorg-video-nvidia-580"
 )
 
 # Function to check if a package is installed
@@ -82,7 +82,8 @@ blacklist nvidia-uvm
 EOF
 
 # Turn off nvidia services that are causing conflicts on my system. Your mileage may vary.
-sudo ln -sf /dev/null ./system/systemd-hibernate.service.requires/nvidia-hibernate.xserver-xorg-video-nvidia-570
+sudo ln -sf /dev/null /etc/systemd/system/systemd-hibernate.service.requires/nvidia-hibernate.service
 sudo systemctl mask nvidia-hibernate.service nvidia-suspend.service sys-bus-pci-drivers-nvidia.device nvidia-resume.service nvidia-fabricmanager.service nvidia-persistenced.service nvidia-suspend-then-hibernate.service
+sudo systemctl daemon-reload
 
 echo "✅ NVIDIA modules installed and blacklisted for manual loading.  Use nvidia_wake.zsh to run programs on the discrete card or to turn the card off if no parameters are given."

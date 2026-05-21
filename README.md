@@ -9,7 +9,7 @@ If you find this project useful and would like to support its development, consi
 - PayPal: https://www.paypal.com/paypalme/m1st0
 - Venmo: https://venmo.com/code?user_id=3319592654995456106
 
-© 2025 Maulik Mistry
+© 2025–2026 Maulik Mistry
 
 This project is licensed under the Apache License 2.0. See the [LICENSE.txt](LICENSE.txt) file for details.
 

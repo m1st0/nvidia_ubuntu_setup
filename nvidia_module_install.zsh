@@ -15,7 +15,7 @@
 SOURCE_FILE="nvidia-kernel-common.conf"
 
 # Define the target path
-TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common-580"
+TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common"
 
 # Check if source file exists
 if [[ ! -f "$SOURCE_FILE" ]]; then
@@ -24,14 +24,14 @@ if [[ ! -f "$SOURCE_FILE" ]]; then
 fi
 
 # Need root permissions to symlink into /etc
-echo "Creating symlink as root..."
+echo "Creating apt preference for 580 drivers as root..."
 sudo cp "$SOURCE_FILE" "$TARGET_PATH"
 
 if [[ $? -eq 0 ]]; then
-  echo "Nvidia conflicting package services prevented from install: "
+  echo "Prevented installing conflicting Nvidia packages: "
   ls -la $TARGET_PATH
 else
-  echo "Failed to create symlink."
+  echo "Failed to install apt preference for setting Nvidia driver apt preference."
 fi
 
 kernel_name=$(uname -r)
@@ -44,7 +44,7 @@ packages=(
     "nvidia-utils-580"
     "libnvidia-gl-580"
     # Until we have X11 gone.
-    "xserver-xorg-video-nvidia-580"
+    #"xserver-xorg-video-nvidia-580"
 )
 
 # Function to check if a package is installed

@@ -1,89 +1,118 @@
-#!/usr/bin/zsh
-# Install the proper Nvidia drivers against service conflicts for Wayland.
-
-# Author and Copyright (c) 2023–2025 Maulik Mistry <mistry01@gmail.com>
-# If you find this project useful and would like to support its development, consider donating via
-# Paypal: https://www.paypal.com/paypalme/m1st0
+#!/usr/bin/env zsh
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (c) 2023-2026 Maulik Mistry
+#
+# Install NVIDIA kernel modules and configure Wayland compatibility on Ubuntu.
+#
+# If you find this project useful and would like to support its development:
+# PayPal: https://www.paypal.com/paypalme/m1st0
 # Venmo: https://venmo.com/code?user_id=3319592654995456106
 
-# License: Apache License 2.0
-# All rights reserved.
 
+# NVIDIA driver version.
+# Update this value when intentionally moving driver generations.
+#
+# If upgrading this value (for example 580 -> 585), previous apt-mark holds
+# will remain on the old NVIDIA package names. Check existing holds with:
+#
+#     apt-mark showhold | grep 'nvidia-'
+#
+# Remove old holds before migrating if needed:
+#
+#     sudo apt-mark unhold <package-name>
+driver_version=580
 
-# Prevent conflicting services from being installed in newer packages.
-# Define where the source file is (your custom preference file)
-SOURCE_FILE="nvidia-kernel-common.conf"
+# Build NVIDIA kernel package list for every installed kernel.
+# This allows a kernel upgrade to require only one reboot.
+packages=()
+kernel_packages=()
 
-# Define the target path
-TARGET_PATH="/etc/apt/preferences.d/nvidia-kernel-common"
+for kernel in /lib/modules/*; do
+    kernel=${kernel##*/}
 
-# Check if source file exists
-if [[ ! -f "$SOURCE_FILE" ]]; then
-  echo "Source file $SOURCE_FILE does not exist. Please create it first."
-  exit 1
-fi
+    kernel_packages+=(
+        "linux-modules-nvidia-${driver_version}-${kernel}"
+        "linux-objects-nvidia-${driver_version}-${kernel}"
+        "linux-signatures-nvidia-${kernel}"
+    )
+done
 
-# Need root permissions to symlink into /etc
-echo "Creating apt preference for 580 drivers as root..."
-sudo cp "$SOURCE_FILE" "$TARGET_PATH"
+packages+=("${kernel_packages[@]}")
 
-if [[ $? -eq 0 ]]; then
-  echo "Prevented installing conflicting Nvidia packages: "
-  ls -la $TARGET_PATH
-else
-  echo "Failed to install apt preference for setting Nvidia driver apt preference."
-fi
-
-kernel_name=$(uname -r)
-
-# Define the packages to check
-packages=(
-    "linux-modules-nvidia-580-${kernel_name}"
-    "linux-objects-nvidia-580-${kernel_name}"
-    "linux-signatures-nvidia-${kernel_name}"
-    "nvidia-utils-580"
-    "libnvidia-gl-580"
-    # Until we have X11 gone.
-    #"xserver-xorg-video-nvidia-580"
+packages+=(
+    "nvidia-utils-${driver_version}"
+    "libnvidia-gl-${driver_version}"
 )
 
-# Function to check if a package is installed
 is_installed() {
-    dpkg -l | grep -q "^ii  $1"
+    dpkg-query -W -f='${Status}\n' "$1" 2>/dev/null | \
+        grep -q '^install ok installed$'
 }
 
-# Check if each package is installed
-all_installed=true
+missing_packages=()
+
 for package in "${packages[@]}"; do
-    if ! is_installed "$package"; then
-        echo "$package is not installed."
-        all_installed=false
+    if is_installed "$package"; then
+        echo "✓ $package is installed."
     else
-        echo "$package is already installed."
+        echo "✗ $package is missing."
+        missing_packages+=("$package")
     fi
 done
 
-# Install packages if any are missing
-if [ "$all_installed" = false ]; then
-    echo "Installing missing packages..."
-    sudo apt install "${packages[@]}"
+if (( ${#missing_packages[@]} > 0 )); then
+    echo
+    echo "Installing missing NVIDIA packages..."
+
+    if sudo apt install -y "${missing_packages[@]}"; then
+        echo
+        echo "Holding NVIDIA kernel packages..."
+        sudo apt-mark hold "${kernel_packages[@]}"
+    else
+        echo "NVIDIA package installation failed."
+        exit 1
+    fi
 else
-    echo "All packages are already installed."
+    echo
+    echo "All NVIDIA packages are already installed."
+
+    echo
+    echo "Holding NVIDIA kernel packages..."
+    sudo apt-mark hold "${kernel_packages[@]}"
 fi
 
-# To prevent Nvidia modules from taking precedence on load during Ubuntu 25.04
-# which results in SDDM failing, add a blacklist file for the modules so they
-# only load on demand. This was an issue when testing Hyprland.
-sudo tee /etc/modprobe.d/blacklist-nvidia.conf > /dev/null <<EOF
+# Prevent NVIDIA modules from automatically loading.
+# This avoids SDDM failures on some Optimus laptops under Wayland.
+sudo tee /etc/modprobe.d/blacklist-nvidia.conf >/dev/null <<EOF
 blacklist nvidia
 blacklist nvidia-drm
 blacklist nvidia-modeset
 blacklist nvidia-uvm
 EOF
 
-# Turn off nvidia services that are causing conflicts on my system. Your mileage may vary.
-sudo ln -sf /dev/null /etc/systemd/system/systemd-hibernate.service.requires/nvidia-hibernate.service
-sudo systemctl mask nvidia-hibernate.service nvidia-suspend.service sys-bus-pci-drivers-nvidia.device nvidia-resume.service nvidia-fabricmanager.service nvidia-persistenced.service nvidia-suspend-then-hibernate.service
+# Disable NVIDIA services that interfere with manual Optimus activation.
+sudo ln -sf /dev/null \
+    /etc/systemd/system/systemd-hibernate.service.requires/nvidia-hibernate.service
+
+sudo systemctl mask \
+    nvidia-hibernate.service \
+    nvidia-suspend.service \
+    sys-bus-pci-drivers-nvidia.device \
+    nvidia-resume.service \
+    nvidia-fabricmanager.service \
+    nvidia-persistenced.service \
+    nvidia-suspend-then-hibernate.service
+
 sudo systemctl daemon-reload
 
-echo "✅ NVIDIA modules installed and blacklisted for manual loading.  Use nvidia_wake.zsh to run programs on the discrete card or to turn the card off if no parameters are given."
+echo
+echo "✓ NVIDIA ${driver_version} modules installed and configured."
+echo "Use nvidia_wake.zsh to run programs on the discrete GPU."
+echo "Run it without parameters to turn the discrete GPU off."
+echo
+echo "If changing NVIDIA driver versions in the future, review existing holds:"
+echo "  apt-mark showhold | grep 'nvidia-'"
+echo
+echo "Remove outdated holds with:"
+echo "  sudo apt-mark unhold <package-name>"

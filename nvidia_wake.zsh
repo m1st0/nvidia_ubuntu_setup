@@ -1,14 +1,15 @@
 #!/usr/bin/env zsh
-# Simplified Nvidia card management on Ubuntu 25.04 provided drivers are 
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (c) 2023-2026 Maulik Mistry
+#
+# Simplified Nvidia card management on Ubuntu 26.04 provided drivers are 
 # installed correctly from my other script.
-
-# Author and Copyright (c) 2023–2025 Maulik Mistry <mistry01@gmail.com>
-# If you find this project useful and would like to support its development, consider donating via
-# Paypal: https://www.paypal.com/paypalme/m1st0
+#
+# If you find this project useful and would like to support its development:
+# PayPal: https://www.paypal.com/paypalme/m1st0
 # Venmo: https://venmo.com/code?user_id=3319592654995456106
 
-# License: Apache License 2.0
-# All rights reserved.
 
 # PCI Device ID of NVIDIA GPU (change if different)
 GPU_DEV="0000:01:00.0"

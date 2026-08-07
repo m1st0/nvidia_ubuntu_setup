@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # nvidia_ubuntu_setup
 
 This project helps install proper Nvidia drivers while avoiding service conflicts on Wayland.  
@@ -9,7 +10,7 @@ If you find this project useful and would like to support its development, consi
 - PayPal: https://www.paypal.com/paypalme/m1st0
 - Venmo: https://venmo.com/code?user_id=3319592654995456106
 
-© 2025–2026 Maulik Mistry
+Copyright (c) 2023-2026 Maulik Mistry
 
 This project is licensed under the Apache License 2.0. See the [LICENSE.txt](LICENSE.txt) file for details.
 
@@ -19,7 +20,6 @@ This project is licensed under the Apache License 2.0. See the [LICENSE.txt](LIC
 Purpose:
 - Installs the correct Nvidia drivers for Wayland.
 - Prevents service conflicts by disabling unnecessary daemons or services that may interfere with Wayland session handling.
-- Optional configuration for PRIME or dynamic GPU switching.
 
 Usage:
 - `./nvidia_module_install.zsh`
@@ -34,14 +34,10 @@ Purpose:
 Usage Example:
 - `./nvidia_wake.zsh glxinfo`
 - `./nvidia_wake.zsh blender`
-- `./nvidia_wake.zsh` turns off Nvidia card (hopefully)
+- `./nvidia_wake.zsh` turns off Nvidia card (hopefully with your hardware)
 
 The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward. If 
 ran without parameteres it attempts to conserve power by 
-
-### nvidia-kernel-common.conf
-
-Retains version of Nvidia package installation for my system since later versions extensively modify Ubuntu breaking functionality.
 
 ## Requirements
 
@@ -52,5 +48,4 @@ Retains version of Nvidia package installation for my system since later version
 ## Known Limitations
 
 - May require manual tweaking for hybrid-GPU laptops with unusual power management firmware.
-- May require nvidia-kernel-common.conf to be updated for newer Nvidia packages.
 

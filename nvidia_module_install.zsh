@@ -10,6 +10,9 @@
 # Venmo: https://venmo.com/code?user_id=3319592654995456106
 
 
+SCRIPT_DIR="${0:A:h}"
+source "$SCRIPT_DIR/vendor/tput_shell_colorize/tput_shell_colorize.sh"
+
 # NVIDIA driver version.
 # Update this value when intentionally moving driver generations.
 #
@@ -54,37 +57,37 @@ missing_packages=()
 
 for package in "${packages[@]}"; do
     if is_installed "$package"; then
-        echo "✓ $package is installed."
+        messenger_std "✓ $package is installed."
     else
-        echo "✗ $package is missing."
+        messenger_end "✗ $package is missing."
         missing_packages+=("$package")
     fi
 done
 
 if (( ${#missing_packages[@]} > 0 )); then
-    echo
-    echo "Installing missing NVIDIA packages..."
+    linefeed
+    messenger_std "Installing missing NVIDIA packages..."
 
     if sudo apt install -y "${missing_packages[@]}"; then
-        echo
-        echo "Holding NVIDIA kernel packages..."
+        linefeed
+        messenger_std "Holding NVIDIA kernel packages..."
         sudo apt-mark hold "${kernel_packages[@]}"
     else
-        echo "NVIDIA package installation failed."
+        messenger_end "NVIDIA package installation failed."
         exit 1
     fi
 else
-    echo
-    echo "All NVIDIA packages are already installed."
+    linefeed
+    messenger_end "All NVIDIA packages are already installed."
 
-    echo
-    echo "Holding NVIDIA kernel packages..."
+    linefeed
+    messenger_std "Holding NVIDIA kernel packages..."
     sudo apt-mark hold "${kernel_packages[@]}"
 fi
 
 # Prevent NVIDIA modules from automatically loading.
 # This avoids SDDM failures on some Optimus laptops under Wayland.
-sudo tee /etc/modprobe.d/blacklist-nvidia.conf >/dev/null <<EOF
+sudo tee /etc/modprobe.d/blacklist-nvidia.conf > /dev/null << 'EOF'
 blacklist nvidia
 blacklist nvidia-drm
 blacklist nvidia-modeset
@@ -106,13 +109,13 @@ sudo systemctl mask \
 
 sudo systemctl daemon-reload
 
-echo
-echo "✓ NVIDIA ${driver_version} modules installed and configured."
-echo "Use nvidia_wake.zsh to run programs on the discrete GPU."
-echo "Run it without parameters to turn the discrete GPU off."
-echo
-echo "If changing NVIDIA driver versions in the future, review existing holds:"
-echo "  apt-mark showhold | grep 'nvidia-'"
-echo
-echo "Remove outdated holds with:"
-echo "  sudo apt-mark unhold <package-name>"
+linefeed
+messenger_std "✓ NVIDIA ${driver_version} modules installed and configured.
+Use nvidia_wake.zsh to run programs on the discrete GPU.
+Run it without parameters to turn the discrete GPU off."
+linefeed
+messenger_std "If changing NVIDIA driver versions in the future, review existing holds:
+  apt-mark showhold | grep 'nvidia-'"
+linefeed
+messenger_std "Remove outdated holds with:
+  sudo apt-mark unhold <package-name>"

@@ -1,7 +1,3 @@
-<!--
-SPDX-License-Identifier: Apache-2.0
-SPDX-FileCopyrightText: Copyright (c) 2023-2026 Maulik Mistry
--->
 # nvidia_ubuntu_setup
 
 This project helps install proper Nvidia drivers while avoiding service conflicts on Wayland.  
@@ -13,7 +9,7 @@ If you find this project useful and would like to support its development, consi
 - PayPal: https://www.paypal.com/paypalme/m1st0
 - Venmo: https://venmo.com/code?user_id=3319592654995456106
 
-Copyright (c) 2023-2026 Maulik Mistry
+© 2025–2026 Maulik Mistry
 
 This project is licensed under the Apache License 2.0. See the [LICENSE.txt](LICENSE.txt) file for details.
 
@@ -23,6 +19,7 @@ This project is licensed under the Apache License 2.0. See the [LICENSE.txt](LIC
 Purpose:
 - Installs the correct Nvidia drivers for Wayland.
 - Prevents service conflicts by disabling unnecessary daemons or services that may interfere with Wayland session handling.
+- Optional configuration for PRIME or dynamic GPU switching.
 
 Usage:
 - `./nvidia_module_install.zsh`
@@ -37,10 +34,19 @@ Purpose:
 Usage Example:
 - `./nvidia_wake.zsh glxinfo`
 - `./nvidia_wake.zsh blender`
-- `./nvidia_wake.zsh` turns off Nvidia card (hopefully with your hardware)
+- `./nvidia_wake.zsh` turns off Nvidia card (hopefully)
 
-The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward. If 
-ran without parameteres it attempts to conserve power by 
+The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward.
+
+**NOTE:**
+Module unloading uses kmod's native busy-module retry. On the author's GTX 1060 system, nvidia_drm remains busy 
+after KMS is enabled, so complete module removal still fails. Other NVIDIA GPUs and driver configurations may unload 
+successfully.
+
+### nvidia-kernel-common.conf
+
+Retains version of Nvidia package installation for my system since later versions extensively modify Ubuntu breaking 
+functionality.
 
 ## Requirements
 
@@ -51,4 +57,5 @@ ran without parameteres it attempts to conserve power by
 ## Known Limitations
 
 - May require manual tweaking for hybrid-GPU laptops with unusual power management firmware.
+- May require nvidia-kernel-common.conf to be updated for newer Nvidia packages.
 

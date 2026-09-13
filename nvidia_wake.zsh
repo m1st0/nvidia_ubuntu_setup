@@ -72,10 +72,9 @@ activate_gpu() {
   env_vars=(
     __NV_PRIME_RENDER_OFFLOAD=1
     __GLX_VENDOR_LIBRARY_NAME=nvidia
-    GBM_BACKEND=nvidia-drm
     __VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json
-    LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib/nvidia
-    GDK_BACKEND=wayland
+    GBM_BACKEND=nvidia-drm
+    GDK_BACKEND=wayland 
   )
   
   CONF_DIR="$SCRIPT_DIR/conf.d"
@@ -98,5 +97,5 @@ if [[ -z "$1" ]]; then
 else
   activate_gpu "$@"
   # Power off the GPU once done
-  suspend_gpu
+  #suspend_gpu
 fi

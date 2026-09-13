@@ -36,8 +36,7 @@ Usage Example:
 - `./nvidia_wake.zsh blender`
 - `./nvidia_wake.zsh` turns off Nvidia card (hopefully with your hardware)
 
-The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward. If 
-ran without parameteres it attempts to conserve power by 
+The script detects if modules are already loaded. If not, it loads them, runs the program, and cleans up afterward.
 
 ## Requirements
 

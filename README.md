@@ -1,4 +1,7 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!--
+SPDX-License-Identifier: Apache-2.0
+SPDX-FileCopyrightText: Copyright (c) 2023-2026 Maulik Mistry
+-->
 # nvidia_ubuntu_setup
 
 This project helps install proper Nvidia drivers while avoiding service conflicts on Wayland.  

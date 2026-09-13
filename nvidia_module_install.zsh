@@ -1,13 +1,12 @@
 #!/usr/bin/env zsh
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright (c) 2023-2026 Maulik Mistry
 #
-# Copyright (c) 2023-2026 Maulik Mistry
+# nvidia_moduole_install.zsh - Install NVIDIA kernel modules and configure Wayland compatibility on Ubuntu.
 #
-# Install NVIDIA kernel modules and configure Wayland compatibility on Ubuntu.
-#
-# If you find this project useful and would like to support its development:
-# PayPal: https://www.paypal.com/paypalme/m1st0
-# Venmo: https://venmo.com/code?user_id=3319592654995456106
+# Author: Maulik Mistry
+# Please share support: https://www.paypal.com/paypalme/m1st0
+#                       https://venmo.com/code?user_id=3319592654995456106&created=1753283702
 
 
 SCRIPT_DIR="${0:A:h}"
@@ -45,7 +44,7 @@ packages+=("${kernel_packages[@]}")
 
 packages+=(
     "nvidia-utils-${driver_version}"
-    "libnvidia-gl-${driver_version}"
+    "libnvidia-gl-${driver_version}" 
 )
 
 is_installed() {
@@ -83,6 +82,10 @@ else
     linefeed
     messenger_std "Holding NVIDIA kernel packages..."
     sudo apt-mark hold "${kernel_packages[@]}"
+fi
+
+if ! sudo apt install -y "nvidia-vaapi-driver"; then
+    messenger_end "Verify you have \`nvidia-vaapi-driver\` available in your APT sources."
 fi
 
 # Prevent NVIDIA modules from automatically loading.

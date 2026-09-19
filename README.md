@@ -2,12 +2,13 @@
 SPDX-License-Identifier: Apache-2.0
 SPDX-FileCopyrightText: Copyright (c) 2023–2026 Maulik Mistry
 -->
-
 # nvidia_ubuntu_setup
 
 This project installs and manages NVIDIA drivers for Ubuntu systems using Wayland.
 
 It provides `nvidia_wake.zsh`, which loads the NVIDIA kernel modules, and launches a specified application using the discrete NVIDIA GPU.
+
+An separate hardware-level power management `gpu_power_state.zsh` is included separate from actuall use of `nvidia_wake.zsh` .
 
 Please share support:
 
@@ -50,8 +51,9 @@ The script:
 2. Powers on the NVIDIA GPU.
 3. Applies the default NVIDIA Wayland/PRIME environment.
 4. Loads an optional application-specific configuration from `conf.d/`.
-5. Runs the requested application.
-6. Attempts to unload the NVIDIA modules after the application exits.
+5. Loads optional GPU-specific module parameters from `modprobe.d/`.
+6. Runs the requested application.
+7. Attempts to unload the NVIDIA modules after the application exits.
 
 The default NVIDIA environment is:
 
@@ -62,10 +64,11 @@ The default NVIDIA environment is:
 * `GDK_BACKEND=wayland`
 
 Application-specific settings can be added under `conf.d/`.
+GPU-specific settings can be added under `modprobe.d/` and appropriate logic added to the script.
 
 #### Module unloading
 
-Module unloading uses kmod's native busy-module retry in previous commits.
+Module unloading uses kmod's native busy-module retry.
 
 On the author's NVIDIA GTX 1060 system, `nvidia_drm` can remain busy after KMS is enabled, preventing complete module removal. 
 Therefore the code has been removed. Other NVIDIA GPUs and driver configurations may unload successfully.
@@ -76,7 +79,7 @@ The NVIDIA modules can remain loaded and subsequent executions of `nvidia_wake.z
 
 The previous GPU suspend path has been removed because the author's GTX 1060 experienced GPU lockups when the suspend operation was used.
 
-The script therefore does not currently suspend the NVIDIA `/proc/driver/nvidia/suspend` interface as part of its normal application workflow.
+The script therefore does not currently use the `/proc/driver/nvidia/suspend` interface as part of its normal application workflow.
 
 ### nvidia-kernel-common.conf
 
@@ -84,6 +87,14 @@ Retains the NVIDIA package version used by this setup.
 
 This configuration is important for newer NVIDIA GPUs where later package versions can make extensive changes to Ubuntu's NVIDIA configuration 
 and cause functionality to break.
+
+### gpu_power_state.zsh
+
+Direct hardware-level control of the NVIDIA GPU power state via ACPI calls, primarily used for aggressive power savings. Kept separate from `nvidia_wake.zsh` to isolate low-level power toggles, as improper state changes can lock the PCI bus and require a system reboot.
+
+Usage:
+
+`./gpu_power_state.zsh [on|off]`
 
 ## Requirements
 
@@ -98,5 +109,5 @@ and cause functionality to break.
 * Hybrid-GPU laptops may require additional configuration depending on their firmware and power-management implementation.
 * NVIDIA kernel modules may remain busy and prevent complete unloading on some hardware.
 * GPU power-management behavior may vary between NVIDIA GPU generations and driver versions.
-* `nvidia-kernel-common.conf` may need to be updated when changing NVIDIA package versions.
+* Within `nvidia_module_install.zsh`, the `driver_version` may need to be updated if newer NVIDIA packages are useful.
 

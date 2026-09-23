@@ -48,7 +48,7 @@ gpu_state() {
   fi
 
   # 3. Ensure ACPI interface exists
-  if [[ ! -w /proc/acpi/call ]]; then
+  if [[ ! -e /proc/acpi/call ]]; then
     messenger_std "Error: /proc/acpi/call is not writable or does not exist."
     return 1
   fi
